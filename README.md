@@ -45,33 +45,12 @@ Features
 #### Hashing algorithms supported:
 * ✓ __SHA256__ (Bitcoin, Freicoin, Peercoin/PPCoin, Terracoin, etc..)
 * ✓ __Scrypt__ (Litecoin, Dogecoin, Feathercoin, etc..)
-* ✓ __Scrypt-Jane__ (YaCoin, CopperBars, Pennies, Tickets, etc..)
-* ✓ __Scrypt-N__ (Vertcoin [VTC])
-* ✓ __Quark__ (Quarkcoin [QRK])
-* ✓ __X11__ (Darkcoin [DRK], Hirocoin, Limecoin)
-* ✓ __X13__ (MaruCoin, BoostCoin)
-* ✓ __NIST5__ (Talkcoin)
-* ✓ __Keccak__ (Maxcoin [MAX], HelixCoin, CryptoMeth, Galleon, 365coin, Slothcoin, BitcointalkCoin)
-* ✓ __Skein__ (Skeincoin [SKC])
-* ✓ __Groestl__ (Groestlcoin [GRS])
-
-May be working (needs additional testing):
-* ? *Blake* (Blakecoin [BLC])
-* ? *Fugue* (Fuguecoin [FC])
-* ? *Qubit* (Qubitcoin [Q2C], Myriadcoin [MYR])
-* ? *SHAvite-3* (INKcoin [INK])
-* ? *Sha1* (Sha1coin [SHA], Yaycoin [YAY])
-
-Not working currently:
-* *Groestl* - for Myriadcoin
-* *Keccak* - for eCoin & Copperlark
-* *Hefty1* (Heavycoin [HVC])
 
 
 Requirements
 ------------
-* node v0.10+
-* coin daemon (preferably one with a relatively updated API and not some crapcoin :p)
+* node v10.15.3+
+* coin daemon 
 
 
 Example Usage
@@ -80,7 +59,8 @@ Example Usage
 #### Install as a node module by cloning repository
 
 ```bash
-git clone https://github.com/zone117x/node-stratum-pool node_modules/stratum-pool
+nvm use 10.15.3
+git clone https://github.com/mebagger/node-stratum-pool node_modules/stratum-pool
 npm update
 ```
 
@@ -88,13 +68,12 @@ npm update
 
 Create the configuration for your coin:
 
-Possible options for `algorithm`: *sha256, scrypt, scrypt-jane, scrypt-n, quark, x11, keccak, blake,
-skein, groestl, fugue, shavite3, hefty1, qubit, or sha1*.
+Possible options for `algorithm`: *sha256, scrypt
 
 ```javascript
 var myCoin = {
-    "name": "Dogecoin",
-    "symbol": "DOGE",
+    "name": "Mooncoin",
+    "symbol": "MOON",
     "algorithm": "scrypt",
     "nValue": 1024, //optional - defaults to 1024
     "rValue": 1, //optional - defaults to 1
@@ -102,61 +81,12 @@ var myCoin = {
 
     /* Magic value only required for setting up p2p block notifications. It is found in the daemon
        source code as the pchMessageStart variable.
-       For example, litecoin mainnet magic: http://git.io/Bi8YFw
-       And for litecoin testnet magic: http://git.io/NXBYJA */
-     "peerMagic": "fbc0b6db" //optional
-     "peerMagicTestnet": "fcc1b7dc" //optional
+       For example, mooncoin mainnet magic: F9F7C0E8
+       And for mooncoin testnet magic:  F3D2C8F1 */
+     "peerMagic": "F9F7C0E8" //optional
+     "peerMagicTestnet": "F3D2C8F1" //optional
 };
 ```
-
-If you are using the `scrypt-jane` algorithm there are additional configurations:
-
-```javascript
-var myCoin = {
-    "name": "Freecoin",
-    "symbol": "FEC",
-    "algorithm": "scrypt-jane",
-    "chainStartTime": 1375801200, //defaults to 1367991200 (YACoin) if not used
-    "nMin": 6, //defaults to 4 if not used
-    "nMax": 32 //defaults to 30 if not used
-};
-```
-
-If you are using the `scrypt-n` algorithm there is an additional configuration:
-```javascript
-var myCoin = {
-    "name": "Execoin",
-    "symbol": "EXE",
-    "algorithm": "scrypt-n",
-    /* This defaults to Vertcoin's timetable if not used. It is required for scrypt-n coins that
-       have modified their N-factor timetable to be different than Vertcoin's. */
-    "timeTable": {
-        "2048": 1390959880,
-        "4096": 1438295269,
-        "8192": 1485630658,
-        "16384": 1532966047,
-        "32768": 1580301436,
-        "65536": 1627636825,
-        "131072": 1674972214,
-        "262144": 1722307603
-    }
-};
-```
-
-If you are using the `keccak` algorithm there are additional configurations *(The rare `normalHashing` keccak coins
-such as Copperlark and eCoin don't appear to work yet - only the popular ones like Maxcoin are)*:
-```javascript
-var myCoin = {
-    "name": "eCoin",
-    "symbol": "ECN",
-    "algorithm": "keccak",
-
-    /* This is not required and set to false by default. Some coins such as Copperlark and eCoin
-       require it to be set to true. Maxcoin and most others are false. */
-    "normalHashing": true
-};
-```
-
 
 Create and start new pool with configuration options and authentication function
 
@@ -167,19 +97,15 @@ var pool = Stratum.createPool({
 
     "coin": myCoin,
 
-    "address": "mi4iBXbBsydtcc5yFmsff2zCFVX4XG7qJc", //Address to where block rewards are given
+    "address": "2LpMRkRjM6VQnttqB6X3L77tNZATx6Fzar", //Address to where block rewards are given
 
     /* Block rewards go to the configured pool wallet address to later be paid out to miners,
        except for a percentage that can go to, for examples, pool operator(s) as pool fees or
        or to donations address. Addresses or hashed public keys can be used. Here is an example
        of rewards going to the main pool op, a pool co-owner, and NOMP donation. */
     "rewardRecipients": {
-        "n37vuNFkXfk15uFnGoVyHZ6PYQxppD3QqK": 1.5, //1.5% goes to pool op
-        "mirj3LtZxbSTharhtXvotqtJXUY7ki5qfx": 0.5, //0.5% goes to a pool co-owner
-
-        /* 0.1% donation to NOMP. This pubkey can accept any type of coin, please leave this in
-           your config to help support NOMP development. */
-        "22851477d63a085dbc2398c8430af1c09e7343f6": 0.1
+        "2LpMRkRjM6VQnttqB6X3L77tNZATx6Fzar": 1.5, //1.5% goes to pool op
+        "2LpMRkRjM6VQnttqB6X3L77tNZATx6Fzar": 0.5, //0.5% goes to a pool co-owner
     },
 
     "blockRefreshInterval": 1000, //How often to poll RPC daemons for new blocks, in milliseconds
@@ -249,15 +175,15 @@ var pool = Stratum.createPool({
     "daemons": [
         {   //Main daemon instance
             "host": "127.0.0.1",
-            "port": 19332,
-            "user": "litecoinrpc",
-            "password": "testnet"
+            "port": 44663,
+            "user": "mooncoinrpc",
+            "password": "SuperSecretLongPassword"
         },
         {   //Backup daemon instance
             "host": "127.0.0.1",
-            "port": 19344,
-            "user": "litecoinrpc",
-            "password": "testnet"
+            "port": 44673,           /* Second wallet instance started on the same host using a non-standard port */
+            "user": "mooncoinrpc",
+            "password": "SuperSecretLongPassword"
         }
     ],
 
@@ -273,7 +199,7 @@ var pool = Stratum.createPool({
         "host": "127.0.0.1",
 
         /* Port configured for daemon (this is the actual peer port not RPC port) */
-        "port": 19333,
+        "port": 44664,
 
         /* If your coin daemon is new enough (i.e. not a shitcoin) then it will support a p2p
            feature that prevents the daemon from spamming our peer node with unnecessary
@@ -369,14 +295,8 @@ Donations
 ---------
 To support development of this project feel free to donate :)
 
-* BTC: `1KRotMnQpxu3sePQnsVLRy3EraRFYfJQFR`
-* LTC: `LKfavSDJmwiFdcgaP1bbu46hhyiWw5oFhE`
-* VTC: `VgW4uFTZcimMSvcnE4cwS3bjJ6P8bcTykN`
-* MAX: `mWexUXRCX5PWBmfh34p11wzS5WX2VWvTRT`
-* QRK: `QehPDAhzVQWPwDPQvmn7iT3PoFUGT7o8bC`
-* DRK: `XcQmhp8ANR7okWAuArcNFZ2bHSB81jpapQ`
-* DOGE: `DBGGVtwAAit1NPZpRm5Nz9VUFErcvVvHYW`
-* Cryptsy Trade Key: `254ca13444be14937b36c44ba29160bd8f02ff76`
+* MOON: `2LpMRkRjM6VQnttqB6X3L77tNZATx6Fzar`
+
 
 License
 -------
