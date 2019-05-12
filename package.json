@@ -28,7 +28,7 @@
         "url": "https://github.com/mebagger/node-stratum-pool.git"
     },
     "dependencies": {
-        "multi-hashing": "git+https://github.com/mebagger/node-multi-hashing.git",
+        "node-multi-hashing": "git+https://github.com/mebagger/node-multi-hashing.git",
         "bignum": "git+https://github.com/mebagger/node-bignum.git",
         "base58-native": "*",
         "safe-buffer": "*",
